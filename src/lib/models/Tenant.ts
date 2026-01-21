@@ -1,0 +1,35 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { Agency } from './Agency';
+export type Tenant = {
+    id?: string;
+    code?: string;
+    service?: string;
+    businessActorId?: string;
+    isIndividualBusiness?: boolean;
+    email?: string;
+    shortName?: string;
+    longName?: string;
+    description?: string;
+    logoUrl?: string;
+    logoId?: string;
+    websiteUrl?: string;
+    socialNetwork?: string;
+    businessRegistrationNumber?: string;
+    taxNumber?: string;
+    capitalShare?: number;
+    ceoName?: string;
+    yearFounded?: number;
+    keywords?: Array<string>;
+    numberOfEmployees?: number;
+    legalForm?: string;
+    isActive?: boolean;
+    status?: string;
+    agencies?: Array<Agency>;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string;
+};
+
