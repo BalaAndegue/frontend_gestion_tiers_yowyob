@@ -1,5 +1,7 @@
 "use client"
 
+import { Separator } from "@/components/ui/separator"
+
 import { useStore } from "@/lib/store"
 import { useParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -97,42 +99,57 @@ export default function ProspectPage() {
                 </TabsContent>
 
                 <TabsContent value="profil" className="pt-6">
-                    <div className="grid grid-cols-3 gap-6">
-                        <Card className="col-span-2 shadow-sm border-0 bg-gray-50/50">
-                            <CardHeader>
-                                <CardTitle>Détails Prospect</CardTitle>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card className="col-span-2 shadow-sm border border-gray-100 bg-white">
+                            <CardHeader className="pb-4 border-b border-gray-50">
+                                <CardTitle className="text-lg font-medium text-gray-900">Détails Prospect</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="bg-white p-4 rounded-lg shadow-sm border grid grid-cols-2 gap-x-8 gap-y-4">
+                            <CardContent className="space-y-8 pt-6">
+                                <div className="grid grid-cols-2 gap-x-12 gap-y-6">
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Identifiant (NUI)</label>
-                                        <p className="font-medium mt-1">{prospect.nui || 'Non défini'}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Identifiant (NUI)</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{prospect.numeroFiscal || prospect.nui || '-'}</p>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date création</label>
-                                        <p className="font-medium mt-1">{prospect.createdAt ? new Date(prospect.createdAt).toLocaleDateString() : '-'}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date création</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{prospect.createdAt ? new Date(prospect.createdAt).toLocaleDateString() : '-'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Source</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{prospect.sourceProspect || '-'}</p>
                                     </div>
                                 </div>
 
-                                <div className="bg-white p-4 rounded-lg shadow-sm border">
-                                    <h4 className="flex items-center gap-2 font-semibold mb-4 text-gray-800">
-                                        <MapPin className="h-4 w-4 text-blue-600" /> Adresse
+                                <Separator />
+
+                                <div>
+                                    <h4 className="flex items-center gap-2 text-sm font-semibold mb-4 text-gray-900">
+                                        <MapPin className="h-4 w-4 text-gray-500" /> Adresse
                                     </h4>
-                                    <p className="text-gray-700">{prospect.address || 'Non renseignée'}</p>
-                                    <p className="text-gray-700 mt-1">{prospect.city}</p>
+                                    <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
+                                        <div>
+                                            <p className="text-gray-900">{prospect.address || 'Non renseignée'}</p>
+                                            <p className="text-gray-900 mt-1">{prospect.city}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-gray-900 font-medium uppercase">{prospect.pays}</p>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="bg-white p-4 rounded-lg shadow-sm border">
-                                    <h4 className="flex items-center gap-2 font-semibold mb-4 text-gray-800">
+                                <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 mt-6">
+                                    <h4 className="flex items-center gap-2 font-semibold mb-4 text-gray-900">
                                         <History className="h-4 w-4 text-orange-600" /> Convertir
                                     </h4>
                                     <p className="text-sm text-gray-600 mb-4">Ce prospect est prêt ? Transformez-le en client pour générer des factures.</p>
-                                    <Button className="w-full bg-green-600 hover:bg-green-700">
-                                        <CheckCircle className="mr-2 h-4 w-4" /> Convertir en Client
-                                    </Button>
-                                    <Button variant="outline" className="w-full mt-2">
-                                        <Calendar className="mr-2 h-4 w-4" /> Planifier RDV
-                                    </Button>
+                                    <div className="flex gap-4">
+                                        <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                                            <CheckCircle className="mr-2 h-4 w-4" /> Convertir en Client
+                                        </Button>
+                                        <Button variant="outline" className="flex-1">
+                                            <Calendar className="mr-2 h-4 w-4" /> Planifier RDV
+                                        </Button>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

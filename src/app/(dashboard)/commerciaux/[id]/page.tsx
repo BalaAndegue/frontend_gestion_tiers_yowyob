@@ -1,5 +1,7 @@
 "use client"
 
+import { Separator } from "@/components/ui/separator"
+
 import { useStore } from "@/lib/store"
 import { useParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -97,24 +99,43 @@ export default function CommercialPage() {
                 </TabsList>
 
                 <TabsContent value="profil" className="pt-6">
-                    <div className="grid grid-cols-3 gap-6">
-                        <Card className="col-span-2 shadow-sm border-0 bg-gray-50/50">
-                            <CardHeader>
-                                <CardTitle>Informations Collaborateur</CardTitle>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card className="col-span-2 shadow-sm border border-gray-100 bg-white">
+                            <CardHeader className="pb-4 border-b border-gray-50">
+                                <CardTitle className="text-lg font-medium text-gray-900">Informations Collaborateur</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="bg-white p-4 rounded-lg shadow-sm border grid grid-cols-2 gap-x-8 gap-y-4">
+                            <CardContent className="space-y-8 pt-6">
+                                <div className="grid grid-cols-2 gap-x-12 gap-y-6">
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Matricule</label>
-                                        <p className="font-medium mt-1">{commercial.matricule}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Matricule</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{commercial.matricule || '-'}</p>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Commission</label>
-                                        <p className="font-medium mt-1 text-green-600">{commercial.commission}%</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Commission</label>
+                                        <p className="text-sm font-medium text-green-600 mt-1">{commercial.commission}%</p>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date Embauche</label>
-                                        <p className="font-medium mt-1">{commercial.dateDebutContrat ? new Date(commercial.dateDebutContrat).toLocaleDateString() : '-'}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date Embauche</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{commercial.dateDebutContrat ? new Date(commercial.dateDebutContrat).toLocaleDateString() : '-'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Zones Couvertes</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{commercial.zonesCouvertes || '-'}</p>
+                                    </div>
+                                </div>
+                                <Separator />
+                                <div>
+                                    <h4 className="flex items-center gap-2 text-sm font-semibold mb-4 text-gray-900">
+                                        <MapPin className="h-4 w-4 text-gray-500" /> Coordonnées
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
+                                        <div>
+                                            <p className="text-gray-900">{commercial.address || 'Adresse non renseignée'}</p>
+                                            <p className="text-gray-900 mt-1">{commercial.city}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-gray-900 font-medium uppercase">{commercial.pays}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>

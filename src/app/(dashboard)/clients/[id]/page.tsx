@@ -1,4 +1,5 @@
 "use client"
+import { Separator } from "@/components/ui/separator"
 
 import { useStore } from "@/lib/store"
 import { useParams, useRouter } from "next/navigation"
@@ -99,64 +100,74 @@ export default function ClientPage() {
                 </TabsList>
 
                 <TabsContent value="profil" className="pt-6">
-                    <div className="grid grid-cols-3 gap-6">
-                        <Card className="col-span-2 shadow-sm border-0 bg-gray-50/50">
-                            <CardHeader>
-                                <CardTitle>Informations Générales</CardTitle>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card className="col-span-2 shadow-sm border border-gray-100 bg-white">
+                            <CardHeader className="pb-4 border-b border-gray-50">
+                                <CardTitle className="text-lg font-medium text-gray-900">Informations Générales</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="bg-white p-4 rounded-lg shadow-sm border grid grid-cols-2 gap-x-8 gap-y-4">
+                            <CardContent className="space-y-8 pt-6">
+                                <div className="grid grid-cols-2 gap-x-12 gap-y-6">
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Identifiant Unique (NUI)</label>
-                                        <p className="font-medium mt-1">{client.nui || 'Non défini'}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Numéro Fiscal (NIU)</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{client.numeroFiscal || client.nui || '-'}</p>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Secteur</label>
-                                        <p className="font-medium mt-1 capitalize">{client.secteurActivite?.toLowerCase() || '-'}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Secteur d'Activité</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1 capitalize">{client.secteurActivite?.toLowerCase() || '-'}</p>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Taille</label>
-                                        <p className="font-medium mt-1">{client.tailleEntreprise || '-'}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Taille Entreprise</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{client.tailleEntreprise || '-'}</p>
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date création</label>
-                                        <p className="font-medium mt-1">{client.dateCreation ? new Date(client.dateCreation).toLocaleDateString() : '-'}</p>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date de Création</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1">{client.dateCreation ? new Date(client.dateCreation).toLocaleDateString() : '-'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Compte Comptable</label>
+                                        <p className="text-sm font-medium text-gray-900 mt-1 font-mono">{client.compteComptable || '-'}</p>
                                     </div>
                                 </div>
 
-                                <div className="bg-white p-4 rounded-lg shadow-sm border">
-                                    <h4 className="flex items-center gap-2 font-semibold mb-4 text-gray-800">
-                                        <MapPin className="h-4 w-4 text-blue-600" /> Adresse
+                                <Separator />
+
+                                <div>
+                                    <h4 className="flex items-center gap-2 text-sm font-semibold mb-4 text-gray-900">
+                                        <MapPin className="h-4 w-4 text-gray-500" /> Adresse & Localisation
                                     </h4>
-                                    <p className="text-gray-700">{client.address}</p>
-                                    {client.complement && <p className="text-gray-500 text-sm mt-1">{client.complement}</p>}
-                                    <p className="text-gray-700 mt-1">{client.postalCode} {client.city}</p>
-                                    <p className="text-gray-700 mt-1 uppercase">{client.pays}</p>
+                                    <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
+                                        <div>
+                                            <p className="text-gray-900">{client.address}</p>
+                                            {client.complement && <p className="text-gray-500 mt-1">{client.complement}</p>}
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-gray-900">{client.postalCode} {client.city}</p>
+                                            <p className="text-gray-900 font-medium uppercase">{client.pays}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
 
                         <div className="space-y-6">
-                            <Card className="shadow-sm border-0 bg-white">
-                                <CardHeader>
-                                    <CardTitle>Contacts Clés</CardTitle>
+                            <Card className="shadow-sm border border-gray-100 bg-white">
+                                <CardHeader className="pb-4 border-b border-gray-50">
+                                    <CardTitle className="text-lg font-medium text-gray-900">Contacts Clés</CardTitle>
                                 </CardHeader>
-                                <CardContent className="space-y-4">
+                                <CardContent className="space-y-4 pt-4">
                                     {client.contacts?.map((contact) => (
-                                        <div key={contact.id} className="flex gap-3 pb-3 border-b last:border-0 last:pb-0">
+                                        <div key={contact.id} className="flex gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
                                             <Avatar className="h-9 w-9">
-                                                <AvatarFallback>{contact.nom.charAt(0)}</AvatarFallback>
+                                                <AvatarFallback className="bg-blue-50 text-blue-600 text-xs">{contact.nom.charAt(0)}</AvatarFallback>
                                             </Avatar>
-                                            <div>
-                                                <p className="font-medium text-sm">{contact.nom}</p>
-                                                <p className="text-xs text-gray-500">{contact.poste}</p>
-                                                <div className="flex gap-2 mt-1">
-                                                    <a href={`mailto:${contact.email}`} className="text-blue-600 hover:underline text-xs">{contact.email}</a>
-                                                </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-sm text-gray-900 truncate">{contact.nom}</p>
+                                                <p className="text-xs text-gray-500 truncate">{contact.poste}</p>
+                                                <a href={`mailto:${contact.email}`} className="text-blue-600 hover:underline text-xs block mt-0.5 truncate">{contact.email}</a>
                                             </div>
                                         </div>
                                     ))}
-                                    {(!client.contacts || client.contacts.length === 0) && <p className="text-sm text-gray-500 italic">Aucun contact enregistré.</p>}
+                                    {(!client.contacts || client.contacts.length === 0) && <p className="text-sm text-gray-500 italic py-2">Aucun contact enregistré.</p>}
                                 </CardContent>
                             </Card>
                         </div>

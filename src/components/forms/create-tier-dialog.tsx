@@ -6,7 +6,6 @@ import { Plus } from "lucide-react"
 import { DraggableDialog } from "@/components/ui/draggable-dialog"
 import { TierForm } from "@/components/forms/tier-form"
 import { Tier, TierType } from "@/types"
-import { v4 as uuidv4 } from 'uuid'
 
 interface CreateTierDialogProps {
     type: TierType
@@ -18,7 +17,7 @@ export function CreateTierDialog({ type, label }: CreateTierDialogProps) {
 
     // Default empty tier based on type
     const emptyTier: Partial<Tier> = {
-        id: uuidv4(), // Generate temporary ID
+        id: "", // Empty ID for new creation
         type: type,
         name: "",
         email: "",

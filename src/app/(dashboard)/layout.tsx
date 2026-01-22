@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     description: 'Gérez vos clients, fournisseurs et commerciaux',
 };
 
+import { DataInitializer } from '@/components/data-initializer';
+
 export default function DashboardLayout({
     children,
 }: {
@@ -14,6 +16,7 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="flex h-screen w-full bg-white overflow-hidden">
+            <DataInitializer />
             {/* Sidebar */}
             <Sidebar />
 

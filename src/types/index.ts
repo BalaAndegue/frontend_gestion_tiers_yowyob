@@ -100,6 +100,7 @@ export interface TierBase {
 
     // Base Info
     name: string; // was nom
+    compteComptable?: string;
     nui?: string;
     shortName?: string;
     longName?: string;
