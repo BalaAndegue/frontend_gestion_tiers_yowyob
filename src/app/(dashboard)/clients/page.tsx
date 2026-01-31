@@ -1,14 +1,16 @@
 "use client"
 
-import { useStore } from "@/lib/store"
+// import { useStore } from "@/lib/store"
+import { MOCK_CLIENTS } from "@/lib_moc_data/mock-data"
 import { columns } from "./columns"
 import { DataTable } from "@/components/ui/data-table"
 import { CreateTierDialog } from "@/components/forms/create-tier-dialog"
-import { Client } from "@/types"
+// import { Client } from "@/types"
 
 export default function ClientsPage() {
-    const { tiers } = useStore()
-    const clients = tiers.filter((t): t is Client => t.type === 'client')
+    // const { tiers } = useStore()
+    // const clients = tiers.filter((t): t is Client => t.type === 'client')
+    const clients = MOCK_CLIENTS
 
     return (
         <div className="space-y-6">

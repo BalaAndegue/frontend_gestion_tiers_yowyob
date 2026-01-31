@@ -37,7 +37,7 @@ export default function CommerciauxPage() {
 
                             <CardContent className="pt-0 relative">
                                 <Avatar className={`h-20 w-20 border-4 border-white absolute -top-10 shadow-md ${!comm.active && 'grayscale'}`}>
-                                    <AvatarImage src={`https://ui.shadcn.com/avatars/${parseInt(comm.id.replace(/\D/g, '')) % 5 + 5}.png`} />
+                                    <AvatarImage src={comm.avatar || `https://ui.shadcn.com/avatars/${parseInt(comm.id.replace(/\D/g, '')) % 5 + 5}.png`} />
                                     <AvatarFallback>{comm.name?.charAt(0)}</AvatarFallback>
                                 </Avatar>
 

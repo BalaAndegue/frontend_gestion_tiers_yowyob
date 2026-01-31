@@ -1,72 +1,66 @@
 "use client"
 
-import { Separator } from "@/components/ui/separator"
-
-import { useStore } from "@/lib/store"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Mail, Phone, MapPin, Building, Truck, CreditCard, Ban, CheckCircle } from "lucide-react"
+import { ArrowLeft, Ban, CheckCircle, Save, Printer } from "lucide-react"
 import Link from "next/link"
-import { Fournisseur } from "@/types"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MOCK_FOURNISSEURS } from "@/lib_moc_data/mock-data"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { useState } from "react"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { TierForm } from "@/components/forms/tier-form"
-import { TierStats } from "@/components/tier-stats"
-import { useState } from "react"
 
 export default function SupplierPage() {
     const { id } = useParams()
-    const { tiers, updateTier } = useStore()
     const [isEditOpen, setIsEditOpen] = useState(false)
 
-    const supplier = tiers.find(t => t.id === id) as Fournisseur | undefined
+    // Fetch from MOCK
+    const supplier = MOCK_FOURNISSEURS.find(t => t.id === id)
 
     if (!supplier) {
-        return <div className="p-8">Fournisseur introuvable</div>
-    }
-
-    const handleToggleActive = () => {
-        updateTier(supplier.id, { active: !supplier.active })
+        return <div className="p-8 text-center text-red-500">Fournisseur introuvable ({id})</div>
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center gap-4">
-                <Link href="/fournisseurs">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </Link>
-                <div className="flex-1 flex items-center gap-4">
-                    <Avatar className="h-12 w-12 border">
-                        <AvatarImage src={`https://ui.shadcn.com/avatars/${parseInt(supplier.id.replace(/\D/g, '')) % 5}.png`} />
-                        <AvatarFallback>{supplier.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
+        <div className="space-y-4 max-w-[1600px] mx-auto p-2">
+            {/* Header / Actions Bar */}
+            <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
+                <div className="flex items-center gap-4">
+                    <Link href="/fournisseurs">
+                        <Button variant="ghost" size="sm">
+                            <ArrowLeft className="h-4 w-4 mr-2" /> Retour
+                        </Button>
+                    </Link>
                     <div>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold">{supplier.name}</h1>
-                            {!supplier.active && <Badge variant="destructive">Inactif</Badge>}
-                            <Badge variant="outline">Fournisseur</Badge>
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                            <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {supplier.email}</span>
-                            <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {supplier.phoneNumber}</span>
-                        </div>
+                        <h1 className="text-2xl font-bold uppercase text-blue-900">Fiche Fournisseur : {supplier.name}</h1>
+                        <p className="text-xs text-gray-500">Fournisseur certifié</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleToggleActive} className={supplier.active ? "text-red-600" : "text-green-600"}>
-                        {supplier.active ? <><Ban className="mr-2 h-4 w-4" /> Désactiver</> : <><CheckCircle className="mr-2 h-4 w-4" /> Activer</>}
+                    <Button variant="outline" size="sm">
+                        <Printer className="h-4 w-4 mr-2" /> Imprimer Fiche
                     </Button>
                     <Sheet open={isEditOpen} onOpenChange={setIsEditOpen}>
                         <SheetTrigger asChild>
-                            <Button>Modifier</Button>
+                            <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
+                                <Save className="h-4 w-4 mr-2" /> Modifier
+                            </Button>
                         </SheetTrigger>
-                        <SheetContent className="sm:max-w-[500px] overflow-y-auto">
+                        <SheetContent className="sm:max-w-[800px] overflow-y-auto">
                             <SheetHeader>
                                 <SheetTitle>Modifier le Fournisseur</SheetTitle>
                                 <SheetDescription>Modifiez les informations ci-dessous.</SheetDescription>
@@ -76,80 +70,147 @@ export default function SupplierPage() {
                             </div>
                         </SheetContent>
                     </Sheet>
+
+                    <Button variant="destructive" size="sm">
+                        <Ban className="h-4 w-4 mr-2" /> Supprimer
+                    </Button>
                 </div>
             </div>
 
-            <Tabs defaultValue="profil" className="w-full">
-                <TabsList className="w-full justify-start border-b rounded-none h-12 bg-transparent p-0">
-                    <TabsTrigger value="profil" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Profil</TabsTrigger>
-                    <TabsTrigger value="commandes" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Commandes</TabsTrigger>
-                    <TabsTrigger value="stats" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Statistiques</TabsTrigger>
+            {/* Main Form Area */}
+            <Card className="border-t-4 border-t-yellow-600 shadow-md">
+                <CardContent className="p-6 space-y-6">
+
+                    {/* Top Stats Box */}
+                    <div className="flex justify-end mb-4">
+                        <div className="bg-yellow-100 border border-yellow-300 px-4 py-2 rounded flex flex-col items-center min-w-[150px]">
+                            <span className="text-xs font-bold text-yellow-800 uppercase">Solde Actuel</span>
+                            <span className="text-xl font-black text-red-600">
+                                {supplier.financial?.solde?.toLocaleString('fr-FR') || '0'} {supplier.financial?.devise || 'XAF'}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-4">
+                            <Label className="text-xs font-semibold text-gray-600">Raison sociale *</Label>
+                            <Input value={supplier.name} readOnly className="bg-gray-50 font-bold" />
+                        </div>
+                        <div className="col-span-4">
+                            <Label className="text-xs font-semibold text-gray-600">Forme Juridique *</Label>
+                            <Input value={supplier.formeJuridique || 'SA'} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-4">
+                            <Label className="text-xs font-semibold text-gray-600">Code Fournisseur *</Label>
+                            <Input value={supplier.codeFournisseur || supplier.id} readOnly className="bg-gray-50" />
+                        </div>
+                    </div>
+
+                    {/* Row 2 */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Pays *</Label>
+                            <Input value={supplier.pays || ''} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Contact *</Label>
+                            <Input value={supplier.contact || ''} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Délai Livraison</Label>
+                            <Input value={supplier.delaiLivraison || 'J+0'} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Famille *</Label>
+                            <Input value={supplier.familleFournisseur || ''} readOnly className="bg-gray-50" />
+                        </div>
+                    </div>
+
+                    {/* Row 3 - Address */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-8">
+                            <Label className="text-xs font-semibold text-gray-600">Adresse :</Label>
+                            <Input value={supplier.address} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2">
+                            <Label className="text-xs font-semibold text-gray-600">Code postale :</Label>
+                            <Input value={supplier.city} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2">
+                            <Label className="text-xs font-semibold text-gray-600">Ville :</Label>
+                            <Input value={supplier.city} readOnly className="bg-gray-50" />
+                        </div>
+                    </div>
+
+                    {/* Row 4 - Contact */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Téléphone :</Label>
+                            <Input value={supplier.phoneNumber} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2">
+                            <Label className="text-xs font-semibold text-gray-600">Fax :</Label>
+                            <Input value={supplier.fax || ''} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Email :</Label>
+                            <Input value={supplier.email} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-4">
+                            <Label className="text-xs font-semibold text-gray-600">Site Web :</Label>
+                            <Input value={supplier.website || ''} readOnly className="bg-gray-50" />
+                        </div>
+                    </div>
+
+                    {/* Row 5 - Notes */}
+                    <div>
+                        <Label className="text-xs font-semibold text-gray-600">Notes / Conditions Particulières :</Label>
+                        <Textarea value={supplier.notes || ''} readOnly className="h-16 bg-gray-50 resize-none" />
+                    </div>
+
+                </CardContent>
+            </Card>
+
+            {/* Tabs Section */}
+            <Tabs defaultValue="factures" className="w-full">
+                <TabsList className="w-full justify-start h-auto flex-wrap bg-gray-100 p-0 rounded-t-lg border-b">
+                    <TabsTrigger value="info" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs">Produits Référencés</TabsTrigger>
+                    <TabsTrigger value="factures" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs font-bold">Historique Factures</TabsTrigger>
+                    <TabsTrigger value="reglements" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs">Règlements</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="stats" className="pt-6">
-                    <TierStats type="fournisseur" />
-                </TabsContent>
+                <div className="bg-white border-x border-b p-4 min-h-[300px]">
+                    <TabsContent value="factures" className="mt-0">
+                        <div className="border rounded">
+                            <Table className="text-xs">
+                                <TableHeader className="bg-gray-100">
+                                    <TableRow>
+                                        <TableHead>NoFacture</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead className="text-right">MontantHT</TableHead>
+                                        <TableHead className="text-right">TVA</TableHead>
+                                        <TableHead className="text-right">MontantTTC</TableHead>
+                                        <TableHead>Statut</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {/* Mock invoices list */}
+                                    <TableRow>
+                                        <TableCell className="text-gray-500 text-center py-8" colSpan={6}>Aucune facture fournisseur mockée pour l'instant.</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </TabsContent>
 
-                <TabsContent value="profil" className="pt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card className="col-span-2 shadow-sm border border-gray-100 bg-white">
-                            <CardHeader className="pb-4 border-b border-gray-50">
-                                <CardTitle className="text-lg font-medium text-gray-900">Informations Fournisseur</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-8 pt-6">
-                                <div className="grid grid-cols-2 gap-x-12 gap-y-6">
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Identifiant (NUI)</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1">{supplier.numeroFiscal || supplier.nui || '-'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Mode de Paiement</label>
-                                        <p className="text-sm font-medium text-blue-600 mt-1 uppercase">{supplier.modePaiement}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Secteur</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1 capitalize">{supplier.secteurActivite?.toLowerCase() || '-'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Délai Livraison</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1">{supplier.delaiLivraison || '-'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Compte Comptable</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1 font-mono">{supplier.compteComptable || '-'}</p>
-                                    </div>
-                                </div>
-
-                                <Separator />
-
-                                <div>
-                                    <h4 className="flex items-center gap-2 text-sm font-semibold mb-4 text-gray-900">
-                                        <MapPin className="h-4 w-4 text-gray-500" /> Coordonnées
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
-                                        <div>
-                                            <p className="text-gray-900">{supplier.address || 'Adresse non renseignée'}</p>
-                                            <p className="text-gray-900 mt-1">{supplier.city}</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-gray-900 font-medium uppercase">{supplier.pays}</p>
-                                            {supplier.website && <p className="text-blue-600 hover:underline">{supplier.website}</p>}
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="commandes" className="pt-6">
-                    <Card className="shadow-sm border">
-                        <CardHeader><CardTitle>Historique des Commandes</CardTitle></CardHeader>
-                        <CardContent className="text-center py-8 text-gray-500">
-                            Module d'achat en cours de développement.
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                    <TabsContent value="info" className="mt-0">
+                        <p className="text-sm text-gray-500 italic">Liste des produits...</p>
+                    </TabsContent>
+                    <TabsContent value="reglements" className="mt-0">
+                        <p className="text-sm text-gray-500 italic">Historique des règlements...</p>
+                    </TabsContent>
+                </div>
             </Tabs>
         </div>
     )

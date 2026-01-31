@@ -1,314 +1,334 @@
 "use client"
-import { Separator } from "@/components/ui/separator"
 
-import { useStore } from "@/lib/store"
 import { useParams, useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Mail, Phone, MapPin, Building, FileText, History, Euro, Wallet, CreditCard, Ban, CheckCircle, BarChart as BarChartIcon } from "lucide-react"
+import { ArrowLeft, Ban, CheckCircle, Save, Printer } from "lucide-react"
 import Link from "next/link"
 import { Client } from "@/types"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { MOCK_CLIENTS } from "@/lib_moc_data/mock-data"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { TierForm } from "@/components/forms/tier-form"
-import { useState } from "react"
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 
 export default function ClientPage() {
     const { id } = useParams()
     const router = useRouter()
-    const { tiers, updateTier } = useStore()
-    const [isEditOpen, setIsEditOpen] = useState(false)
 
-    const client = tiers.find(t => t.id === id) as Client | undefined
+    // Fetch from MOCK
+    const client = MOCK_CLIENTS.find(t => t.id === id)
 
     if (!client) {
-        return <div className="p-8">Client introuvable</div>
+        return <div className="p-8 text-center text-red-500">Client introuvable ({id})</div>
     }
-
-    const handleToggleActive = () => {
-        updateTier(client.id, { active: !client.active })
-    }
-
-    // Mock stats data
-    const statsData = [
-        { name: 'Jan', total: 1200 },
-        { name: 'Fév', total: 2100 },
-        { name: 'Mar', total: 800 },
-        { name: 'Avr', total: 1600 },
-        { name: 'Mai', total: 900 },
-        { name: 'Juin', total: 1700 },
-    ]
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center gap-4">
-                <Link href="/clients">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                </Link>
-                <div className="flex-1 flex items-center gap-4">
-                    <Avatar className="h-12 w-12 border">
-                        <AvatarImage src={`https://ui.shadcn.com/avatars/${parseInt(client.id.replace(/\D/g, '')) % 5}.png`} />
-                        <AvatarFallback>{client.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
+        <div className="space-y-4 max-w-[1600px] mx-auto p-2">
+            {/* Header / Actions Bar similar to right sidebar in screenshot but horizontal for web */}
+            <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm border">
+                <div className="flex items-center gap-4">
+                    <Link href="/clients">
+                        <Button variant="ghost" size="sm">
+                            <ArrowLeft className="h-4 w-4 mr-2" /> Retour
+                        </Button>
+                    </Link>
                     <div>
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold">{client.name}</h1>
-                            {!client.active && <Badge variant="destructive">Inactif</Badge>}
-                            {client.segment && <Badge variant="secondary">{client.segment}</Badge>}
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                            <span className="flex items-center gap-1"><Mail className="h-3 w-3" /> {client.email}</span>
-                            <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {client.phoneNumber}</span>
-                        </div>
+                        <h1 className="text-2xl font-bold uppercase text-blue-900">Fiche Client : {client.name}</h1>
+                        <p className="text-xs text-gray-500">Utilisateur : Administrateur</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleToggleActive} className={client.active ? "text-red-600 hover:text-red-700 hover:bg-red-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}>
-                        {client.active ? <><Ban className="mr-2 h-4 w-4" /> Désactiver</> : <><CheckCircle className="mr-2 h-4 w-4" /> Activer</>}
+                    <Button variant="outline" size="sm">
+                        <Printer className="h-4 w-4 mr-2" /> Solde des comptes
                     </Button>
-
-                    <Sheet open={isEditOpen} onOpenChange={setIsEditOpen}>
-                        <SheetTrigger asChild>
-                            <Button>Modifier</Button>
-                        </SheetTrigger>
-                        <SheetContent className="sm:max-w-[500px] overflow-y-auto">
-                            <SheetHeader>
-                                <SheetTitle>Modifier le Client</SheetTitle>
-                                <SheetDescription>Modifiez les informations ci-dessous.</SheetDescription>
-                            </SheetHeader>
-                            <div className="py-6">
-                                <TierForm tier={client} onSuccess={() => setIsEditOpen(false)} />
-                            </div>
-                        </SheetContent>
-                    </Sheet>
+                    <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
+                        <Save className="h-4 w-4 mr-2" /> Enregistrer
+                    </Button>
+                    <Button variant="destructive" size="sm">
+                        <Ban className="h-4 w-4 mr-2" /> Supprimer
+                    </Button>
                 </div>
             </div>
 
-            <Tabs defaultValue="profil" className="w-full">
-                <TabsList className="w-full justify-start border-b rounded-none h-12 bg-transparent p-0">
-                    <TabsTrigger value="profil" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Profil</TabsTrigger>
-                    <TabsTrigger value="finance" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Finance</TabsTrigger>
-                    <TabsTrigger value="stats" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Statistiques</TabsTrigger>
-                    <TabsTrigger value="factures" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Factures ({client.factures?.length || 0})</TabsTrigger>
-                    <TabsTrigger value="comms" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none rounded-none h-full px-8">Communications</TabsTrigger>
+            {/* Main Form Area */}
+            <Card className="border-t-4 border-t-blue-600 shadow-md">
+                <CardContent className="p-6 space-y-6">
+
+                    {/* Top Stats Box */}
+                    <div className="flex justify-end mb-4">
+                        <div className="bg-orange-100 border border-orange-300 px-4 py-2 rounded flex flex-col items-center min-w-[150px]">
+                            <span className="text-xs font-bold text-orange-800 uppercase">Solde Actuel</span>
+                            <span className="text-xl font-black text-red-600">
+                                {client.financial?.solde?.toLocaleString('fr-FR')} {client.financial?.devise}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Row 1 */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-4">
+                            <Label className="text-xs font-semibold text-gray-600">Raison sociale *</Label>
+                            <Input value={client.name} readOnly className="bg-gray-50 font-bold" />
+                        </div>
+                        <div className="col-span-4">
+                            <Label className="text-xs font-semibold text-gray-600">Société *</Label>
+                            <Input value={client.name} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-4">
+                            <Label className="text-xs font-semibold text-gray-600">Code *</Label>
+                            <Input value={client.code || client.id} readOnly className="bg-gray-50" />
+                        </div>
+                    </div>
+
+                    {/* Row 2 */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Pays *</Label>
+                            <Input value={client.pays || ''} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Contact *</Label>
+                            <Input value={client.contact || ''} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Forme juridique *</Label>
+                            <Input value={client.formeJuridique || 'Individuel'} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            {/* Trying to match Famille/Type client split */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <Label className="text-xs font-semibold text-gray-600">Famille *</Label>
+                                    <Input value={client.familleClient || ''} readOnly className="bg-gray-50" />
+                                </div>
+                                <div>
+                                    <Label className="text-xs font-semibold text-gray-600">Type *</Label>
+                                    <Input value={client.segment || ''} readOnly className="bg-gray-50" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 3 - Pricing & Misc */}
+                    <div className="bg-gray-50 p-3 rounded border border-gray-100">
+                        <Label className="text-xs font-bold text-red-500 mb-2 block">Les prix à appliquer *</Label>
+                        <div className="grid grid-cols-12 gap-4 items-center">
+                            <div className="col-span-2 flex items-center space-x-2">
+                                <Checkbox checked={client.estAssujettiTVA} disabled />
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Assujeti à la TVA</label>
+                            </div>
+                            <div className="col-span-6 flex gap-4">
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox checked={client.pricingCategory?.detail} disabled />
+                                    <label className="text-sm">Détail</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox checked={client.pricingCategory?.demisGros} disabled />
+                                    <label className="text-sm">Démis gros</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox checked={client.pricingCategory?.gros} disabled />
+                                    <label className="text-sm">Gros</label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox checked={client.pricingCategory?.superGros} disabled />
+                                    <label className="text-sm">Super Gros</label>
+                                </div>
+                            </div>
+                            <div className="col-span-2">
+                                <Label className="text-[10px] text-gray-500">Nbre copies Facture</Label>
+                                <Input className="h-8" value={client.creditInfo?.copiesFacture || 0} readOnly />
+                            </div>
+                            <div className="col-span-2">
+                                <Label className="text-[10px] text-gray-500">Taux Rem. Fact.</Label>
+                                <Input className="h-8" value={client.creditInfo?.tauxRemise || 0} readOnly />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 4 - Address */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-8">
+                            <Label className="text-xs font-semibold text-gray-600">Adresse :</Label>
+                            <Input value={client.address} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2">
+                            <Label className="text-xs font-semibold text-gray-600">Code postale :</Label>
+                            <Input value={client.postalCode} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2">
+                            <Label className="text-xs font-semibold text-gray-600">Ville :</Label>
+                            <Input value={client.city} readOnly className="bg-gray-50" />
+                        </div>
+                    </div>
+
+                    {/* Row 5 - Contact & Credit */}
+                    <div className="grid grid-cols-12 gap-4">
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Téléphone :</Label>
+                            <Input value={client.phoneNumber} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2">
+                            <Label className="text-xs font-semibold text-gray-600">Fax :</Label>
+                            <Input value={client.fax || ''} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-3">
+                            <Label className="text-xs font-semibold text-gray-600">Email :</Label>
+                            <Input value={client.email} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2">
+                            <Label className="text-xs font-semibold text-gray-600">Site Web :</Label>
+                            <Input value={client.website || ''} readOnly className="bg-gray-50" />
+                        </div>
+                        <div className="col-span-2 bg-red-50 p-2 rounded border border-red-100">
+                            <Label className="text-xs font-semibold text-red-600">Plafond crédit :</Label>
+                            <div className="flex items-center gap-2">
+                                <Input value={client.plafondCredit?.toLocaleString()} className="h-8 font-bold text-red-600 bg-white" readOnly />
+                            </div>
+                            <div className="flex items-center mt-1 space-x-1">
+                                <Checkbox checked={!client.creditInfo?.activé} disabled />
+                                <span className="text-[9px] whitespace-nowrap">Cocher pour désactiver</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 6 - Notes */}
+                    <div>
+                        <Label className="text-xs font-semibold text-gray-600">Notes :</Label>
+                        <Textarea value={client.notes || ''} readOnly className="h-16 bg-gray-50 resize-none" />
+                    </div>
+
+                </CardContent>
+            </Card>
+
+            {/* Tabs Section */}
+            <Tabs defaultValue="solde" className="w-full">
+                <TabsList className="w-full justify-start h-auto flex-wrap bg-gray-100 p-0 rounded-t-lg border-b">
+                    <TabsTrigger value="info" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs">Informations comptables</TabsTrigger>
+                    <TabsTrigger value="products" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs">Liste des produits</TabsTrigger>
+                    <TabsTrigger value="modes" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs">Modes règlement autorisés</TabsTrigger>
+                    <TabsTrigger value="solde" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs font-bold">Situation du solde</TabsTrigger>
+                    <TabsTrigger value="factures" className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[state=active]:bg-white px-4 py-2 text-xs">Liste des factures</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="profil" className="pt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card className="col-span-2 shadow-sm border border-gray-100 bg-white">
-                            <CardHeader className="pb-4 border-b border-gray-50">
-                                <CardTitle className="text-lg font-medium text-gray-900">Informations Générales</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-8 pt-6">
-                                <div className="grid grid-cols-2 gap-x-12 gap-y-6">
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Numéro Fiscal (NIU)</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1">{client.numeroFiscal || client.nui || '-'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Secteur d'Activité</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1 capitalize">{client.secteurActivite?.toLowerCase() || '-'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Taille Entreprise</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1">{client.tailleEntreprise || '-'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date de Création</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1">{client.dateCreation ? new Date(client.dateCreation).toLocaleDateString() : '-'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Compte Comptable</label>
-                                        <p className="text-sm font-medium text-gray-900 mt-1 font-mono">{client.compteComptable || '-'}</p>
-                                    </div>
-                                </div>
+                <div className="bg-white border-x border-b p-4 min-h-[300px]">
+                    <TabsContent value="solde" className="mt-0">
+                        {/* Situation du Solde Table */}
+                        <div className="border rounded">
+                            <Table className="text-xs">
+                                <TableHeader className="bg-gray-100">
+                                    <TableRow>
+                                        <TableHead>Magasin</TableHead>
+                                        <TableHead>Etat</TableHead>
+                                        <TableHead>BL N°</TableHead>
+                                        <TableHead>Livré le</TableHead>
+                                        <TableHead>Règlement</TableHead>
+                                        <TableHead className="text-right">Montant TTC</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {/* Warnings / Solde Header Row */}
+                                    <TableRow className="bg-red-600 text-white font-bold hover:bg-red-600">
+                                        <TableCell colSpan={5} className="py-1 text-center border-r uppercase">&lt;- SOLDE -&gt;</TableCell>
+                                        <TableCell className="text-right py-1">0,0</TableCell>
+                                    </TableRow>
 
-                                <Separator />
-
-                                <div>
-                                    <h4 className="flex items-center gap-2 text-sm font-semibold mb-4 text-gray-900">
-                                        <MapPin className="h-4 w-4 text-gray-500" /> Adresse & Localisation
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm">
-                                        <div>
-                                            <p className="text-gray-900">{client.address}</p>
-                                            {client.complement && <p className="text-gray-500 mt-1">{client.complement}</p>}
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-gray-900">{client.postalCode} {client.city}</p>
-                                            <p className="text-gray-900 font-medium uppercase">{client.pays}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <div className="space-y-6">
-                            <Card className="shadow-sm border border-gray-100 bg-white">
-                                <CardHeader className="pb-4 border-b border-gray-50">
-                                    <CardTitle className="text-lg font-medium text-gray-900">Contacts Clés</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4 pt-4">
-                                    {client.contacts?.map((contact) => (
-                                        <div key={contact.id} className="flex gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
-                                            <Avatar className="h-9 w-9">
-                                                <AvatarFallback className="bg-blue-50 text-blue-600 text-xs">{contact.nom.charAt(0)}</AvatarFallback>
-                                            </Avatar>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-medium text-sm text-gray-900 truncate">{contact.nom}</p>
-                                                <p className="text-xs text-gray-500 truncate">{contact.poste}</p>
-                                                <a href={`mailto:${contact.email}`} className="text-blue-600 hover:underline text-xs block mt-0.5 truncate">{contact.email}</a>
-                                            </div>
-                                        </div>
+                                    {client.balanceStatusData?.map((item, idx) => (
+                                        <TableRow key={idx}>
+                                            <TableCell>{item.magasin}</TableCell>
+                                            <TableCell>{item.etat}</TableCell>
+                                            <TableCell>{item.blNo}</TableCell>
+                                            <TableCell>{item.livreLe}</TableCell>
+                                            <TableCell>{item.reglement}</TableCell>
+                                            <TableCell className="text-right font-medium">{item.montantTTC.toLocaleString('fr-FR', { minimumFractionDigits: 1 })}</TableCell>
+                                        </TableRow>
                                     ))}
-                                    {(!client.contacts || client.contacts.length === 0) && <p className="text-sm text-gray-500 italic py-2">Aucun contact enregistré.</p>}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                </TabsContent>
 
-                <TabsContent value="finance" className="pt-6">
-                    <div className="grid grid-cols-3 gap-6">
-                        {/* Balance & Status */}
-                        <div className="col-span-1 space-y-6">
-                            <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg border-0">
-                                <CardContent className="pt-6">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <p className="text-blue-100 text-sm font-medium">Solde Actuel</p>
-                                            <h3 className="text-3xl font-bold mt-2">
-                                                {client.financial?.solde?.toLocaleString('fr-FR', { style: 'currency', currency: client.financial.devise || 'EUR' }) || '0,00 €'}
-                                            </h3>
-                                        </div>
-                                        <Wallet className="h-8 w-8 text-blue-200 opacity-50" />
-                                    </div>
-                                    <div className="mt-6 pt-4 border-t border-blue-500/30 flex justify-between text-sm">
-                                        <span className="text-blue-100">Plafond Crédit</span>
-                                        <span className="font-semibold">{client.plafondCredit?.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }) || '-'}</span>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                    {/* Totals Row */}
+                                    <TableRow className="bg-gray-700 text-white font-bold hover:bg-gray-700">
+                                        <TableCell colSpan={5} className="py-1 border-r text-red-500"> --&gt; Totaux Magasin</TableCell>
+                                        <TableCell className="text-right py-1 text-red-500">
+                                            {client.balanceStatusData?.reduce((acc, i) => acc + i.montantTTC, 0).toLocaleString('fr-FR', { minimumFractionDigits: 1 })}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow className="bg-blue-800 text-white font-bold hover:bg-blue-800">
+                                        <TableCell colSpan={5} className="py-1 border-r"> Totaux factures</TableCell>
+                                        <TableCell className="text-right py-1">
+                                            {client.balanceStatusData?.reduce((acc, i) => acc + i.montantTTC, 0).toLocaleString('fr-FR', { minimumFractionDigits: 1 })}
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
                         </div>
+                    </TabsContent>
 
-                        {/* Payment Methods */}
-                        <Card className="col-span-2 shadow-sm">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <CreditCard className="h-5 w-5 text-gray-500" />
-                                    Modes de Paiement Autorisés
-                                </CardTitle>
-                                <CardDescription>Moyens de paiement validés pour ce client.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex gap-2 flex-wrap">
-                                    {client.financial?.modesPaiementAutorises?.map((mode) => (
-                                        <Badge key={mode} variant="secondary" className="px-3 py-1 text-sm font-medium">
-                                            {mode}
-                                        </Badge>
+                    <TabsContent value="modes" className="mt-0">
+                        <div className="max-w-2xl border rounded">
+                            <Table className="text-xs">
+                                <TableHeader className="bg-gray-100">
+                                    <TableRow>
+                                        <TableHead className="w-[100px]">Code</TableHead>
+                                        <TableHead>Libellé</TableHead>
+                                        <TableHead className="w-[100px]">Autorisé?</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {client.paymentMethodsData?.map((mode) => (
+                                        <TableRow key={mode.code}>
+                                            <TableCell className="font-bold">{mode.code}</TableCell>
+                                            <TableCell className="font-medium">{mode.libelle}</TableCell>
+                                            <TableCell>
+                                                <Checkbox checked={mode.autorise} disabled />
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
-                                    {(!client.financial?.modesPaiementAutorises || client.financial.modesPaiementAutorises.length === 0) && (
-                                        <p className="text-sm text-gray-500 italic">Aucun mode de paiement spécifié.</p>
-                                    )}
-                                </div>
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </TabsContent>
 
-                                <div className="mt-8">
-                                    <h4 className="text-sm font-medium text-gray-900 mb-2">Informations Bancaires (RIB)</h4>
-                                    <div className="p-4 bg-gray-50 rounded border font-mono text-sm text-gray-600 break-all">
-                                        {client.financial?.rib || 'Aucun RIB enregistré.'}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
+                    <TabsContent value="factures" className="mt-0">
+                        <div className="border rounded">
+                            <Table className="text-xs">
+                                <TableHeader className="bg-gray-100">
+                                    <TableRow>
+                                        <TableHead>NomClient</TableHead>
+                                        <TableHead>NoFacture</TableHead>
+                                        <TableHead className="text-right">MontantHT</TableHead>
+                                        <TableHead className="text-right">MontantRemise</TableHead>
+                                        <TableHead className="text-right">MontantTVA</TableHead>
+                                        <TableHead className="text-right">MontantPrCpte</TableHead>
+                                        <TableHead className="text-right">MontantTTC</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {/* Mock invoices list to match screenshot structure if needed, or use client.factures if mapped */}
+                                    <TableRow>
+                                        <TableCell className="text-gray-500 text-center py-8" colSpan={7}>Aucune facture à afficher pour le moment (Mock Data Vide pour cet onglet)</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </TabsContent>
 
-                <TabsContent value="stats" className="pt-6">
-                    <div className="grid grid-cols-2 gap-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Volume d'Affaires</CardTitle>
-                                <CardDescription>Projection sur les 6 derniers mois</CardDescription>
-                            </CardHeader>
-                            <CardContent className="h-[300px]">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={statsData}>
-                                        <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                                        <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}€`} />
-                                        <Tooltip />
-                                        <Bar dataKey="total" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Répartition des Achats</CardTitle>
-                                <CardDescription>Par catégorie de produit</CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex items-center justify-center h-[300px] text-gray-500">
-                                Graphique en construction...
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="factures" className="pt-6">
-                    <Card className="shadow-sm border">
-                        <CardHeader><CardTitle>Historique des Factures</CardTitle></CardHeader>
-                        <CardContent>
-                            <div className="space-y-2">
-                                {client.factures?.map(facture => (
-                                    <div key={facture.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                                        <div className="flex items-center gap-3">
-                                            <FileText className="h-8 w-8 text-blue-500 p-1.5 bg-blue-100 rounded-lg" />
-                                            <div>
-                                                <p className="font-medium">{facture.numero}</p>
-                                                <p className="text-xs text-gray-500">Du {new Date(facture.date).toLocaleDateString()}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-bold">{facture.montantTTC.toFixed(2)} €</p>
-                                            <Badge variant={facture.statut === 'payée' ? 'secondary' : 'destructive'} className="text-xs capitalize">{facture.statut}</Badge>
-                                        </div>
-                                    </div>
-                                ))}
-                                {(!client.factures || client.factures.length === 0) && <p className="text-center py-8 text-gray-500">Aucune facture.</p>}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="comms" className="pt-6">
-                    <Card className="shadow-sm border">
-                        <CardHeader><CardTitle>Journal des échanges</CardTitle></CardHeader>
-                        <CardContent>
-                            <div className="space-y-6 relative border-l ml-3 pl-8">
-                                {client.communications?.map((comm, idx) => (
-                                    <div key={comm.id} className="relative">
-                                        <span className="absolute -left-[41px] bg-white border-2 border-blue-500 rounded-full h-4 w-4 mt-1.5 ring-4 ring-white"></span>
-                                        <div className="flex flex-col gap-1">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 uppercase">{comm.type}</span>
-                                                <span className="text-xs text-gray-500">{new Date(comm.date).toLocaleDateString()}</span>
-                                            </div>
-                                            <p className="font-medium">{comm.sujet}</p>
-                                            <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border">{comm.contenu}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                                {(!client.communications || client.communications.length === 0) && <p className="text-sm text-gray-500 -ml-5">Aucune communication enregistrée.</p>}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
+                    <TabsContent value="info" className="mt-0">
+                        <p className="text-sm text-gray-500 italic">Informations comptables...</p>
+                    </TabsContent>
+                    <TabsContent value="products" className="mt-0">
+                        <p className="text-sm text-gray-500 italic">Liste des produits...</p>
+                    </TabsContent>
+                </div>
             </Tabs>
         </div>
     )

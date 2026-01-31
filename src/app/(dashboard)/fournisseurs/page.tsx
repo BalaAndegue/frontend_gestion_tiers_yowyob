@@ -1,14 +1,16 @@
 "use client"
 
-import { useStore } from "@/lib/store"
+// import { useStore } from "@/lib/store"
+import { MOCK_FOURNISSEURS } from "@/lib_moc_data/mock-data"
 import { columns } from "./columns"
 import { DataTable } from "@/components/ui/data-table"
 import { CreateTierDialog } from "@/components/forms/create-tier-dialog"
-import { Fournisseur } from "@/types"
+// import { Fournisseur } from "@/types"
 
 export default function FournisseursPage() {
-    const { tiers } = useStore()
-    const fournisseurs = tiers.filter((t): t is Fournisseur => t.type === 'fournisseur')
+    // const { tiers } = useStore()
+    // const fournisseurs = tiers.filter((t): t is Fournisseur => t.type === 'fournisseur')
+    const fournisseurs = MOCK_FOURNISSEURS
 
     return (
         <div className="space-y-6">

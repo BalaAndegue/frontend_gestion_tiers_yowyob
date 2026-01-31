@@ -60,7 +60,7 @@ export namespace Tiers {
         EMAIL = 'EMAIL',
         PHONE = 'PHONE',
         COURRIER = 'COURRIER',
-        IN_PERSON = 'IN_PERSON',
+        IN_PERSON = 'IN_PERSONstring',
     }
     export enum typeEntreprise {
         PARTICULIER = 'PARTICULIER',

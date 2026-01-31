@@ -5,6 +5,7 @@ import { FournisseursService } from './services/FournisseursService';
 import { CommerciauxService } from './services/CommerciauxService';
 import { ProspectsService } from './services/ProspectsService';
 import { TiersService } from './services/TiersService';
+import { MOCK_TIERS } from '@/lib_moc_data/mock-data';
 
 interface AppState {
     currentUser: User | null;
@@ -71,16 +72,23 @@ export const useStore = create<AppState>((set, get) => ({
 
             set({
                 tiers: [
+                    ...MOCK_TIERS, // Always include mocks for dev visibility as requested
                     ...formattedClients,
                     ...formattedFournisseurs,
                     ...formattedCommerciaux,
                     ...formattedProspects
-                ],
+                ].filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i), // Dedup by ID
                 isLoading: false
             });
         } catch (err: any) {
             console.error('Failed to fetch tiers', err);
-            set({ error: err.message || 'Failed to fetch data', isLoading: false });
+            // Fallback to MOCK_TIERS in case of error (e.g. backend not running)
+            console.warn('Backend unavailable, using MOCK_TIERS');
+            set({
+                tiers: MOCK_TIERS,
+                isLoading: false,
+                error: null // Clear error to allow UI to show mock data
+            });
         }
     },
 

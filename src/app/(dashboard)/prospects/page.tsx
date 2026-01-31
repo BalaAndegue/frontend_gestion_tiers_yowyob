@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowUpDown } from "lucide-react"
 import Link from "next/link"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const columns: ColumnDef<Prospect>[] = [
     {
@@ -25,9 +26,15 @@ const columns: ColumnDef<Prospect>[] = [
             )
         },
         cell: ({ row }) => (
-            <div className="flex flex-col">
-                <span className="font-medium">{row.original.name}</span>
-                {!row.original.active && <Badge variant="destructive" className="w-fit text-[10px] h-4 px-1">Inactif</Badge>}
+            <div className="flex items-center gap-3">
+                <Avatar className="h-9 w-9">
+                    <AvatarImage src={row.original.avatar} />
+                    <AvatarFallback>{row.original.name?.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col">
+                    <span className="font-medium">{row.original.name}</span>
+                    {!row.original.active && <Badge variant="destructive" className="w-fit text-[10px] h-4 px-1">Inactif</Badge>}
+                </div>
             </div>
         ),
     },

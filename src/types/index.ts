@@ -24,7 +24,7 @@ export type Potentiel = 'FAIBLE' | 'MOYEN' | 'ELEVE' | 'STRATEGIQUE';
 export type ModePaiementFournisseur = 'VIREMENT' | 'CHEQUE' | 'TRAITE';
 export type ProduitPrincipal = 'ELECTRONIQUE' | 'MATERIEL' | 'LOGICIEL';
 export type TypeCommercial = 'INTERNE' | 'EXTERNE' | 'INDEPENDANT';
-export type ZoneCouverture = 'NORD' | 'SUD' | 'EST' | 'OUEST' | 'INTERNATIONAL';
+export type ZoneCouverture = 'NORD' | 'SUD' | 'EST' | 'OUEST' | 'CENTRE' | 'LITTORAL' | 'INTERNATIONAL';
 export type Specialisation = 'B2B' | 'B2C' | 'SECTEUR_PUBLIC' | 'GRANDS_COMPTES';
 export type SegmentClient = 'PARTICULIER' | 'ENTREPRISE' | 'REVENDEUR';
 export type CanalAquisition = 'WEB' | 'RESEAU' | 'RECOMMANDATION';
@@ -92,6 +92,15 @@ export interface Communication {
     piecesJointes?: string[];
 }
 
+export interface PaiementCommission {
+    id: string;
+    date: Date;
+    montant: number;
+    reference: string;
+    note?: string;
+    statut: 'en_attente' | 'payé' | 'annulé';
+}
+
 // Core Entity Structure
 export interface TierBase {
     id: string; // UUID
@@ -99,12 +108,14 @@ export interface TierBase {
     agencyId?: string;
 
     // Base Info
+    code?: string; // e.g. CLI000425
     name: string; // was nom
     compteComptable?: string;
     nui?: string;
     shortName?: string;
     longName?: string;
     description?: string;
+    avatar?: string; // URL to profile photo
 
     // Contact
     email: string;
@@ -151,14 +162,54 @@ export interface Client extends TierBase {
     plafondCredit?: number;
     canalAquisition?: CanalAquisition;
 
+    // Screenshot fields
+    fax?: string;
+    contact?: string; // "Contact Divers"
+    formeJuridique?: string; // "Individuel", "SA", etc.
+    familleClient?: string; // "Grossiste"
+
+    // Pricing Categories checkboxes
+    pricingCategory?: {
+        detail: boolean;
+        demisGros: boolean;
+        gros: boolean;
+        superGros: boolean;
+    };
+
+    // Credit logic
+    creditInfo?: {
+        activé: boolean; // "Cocher pour désactiver" -> inverted logic likely, but let's store if credit is active
+        copiesFacture?: number;
+        tauxRemise?: number;
+    };
+
+    notes?: string; // Simple note field
+
     factures?: Facture[];
     communications?: Communication[];
-    notes?: Note[];
+    // notes?: Note[]; // Legacy, preferring simple string for now based on screenshot
+
+    // Tab Data Structures
+    balanceStatusData?: {
+        magasin: string;
+        etat: string;
+        blNo: string;
+        livreLe: string;
+        reglement: string;
+        montantTTC: number;
+    }[];
+
+    paymentMethodsData?: {
+        code: string;
+        libelle: string;
+        autorise: boolean;
+    }[];
 
     // Legacy
     categorie?: 'A' | 'B' | 'C';
-    siret?: string; // Maps to NUI or numeroFiscal
+    siret?: string;
     tva?: string;
+    estAssujettiTVA?: boolean; // "Assujeti à la TVA"
 }
 
 export interface Fournisseur extends TierBase {
@@ -168,7 +219,14 @@ export interface Fournisseur extends TierBase {
     produitsPrincipaux?: ProduitPrincipal;
     certification?: string;
 
+    // Screenshot equivalent fields (assuming similar structure for supplier)
+    fax?: string;
+    contact?: string;
+    formeJuridique?: string;
+    familleFournisseur?: string;
+
     factures?: Facture[];
+    notes?: string;
 
     // Legacy
     codeFournisseur?: string;
@@ -184,9 +242,14 @@ export interface Commercial extends TierBase {
     zonesCouvertes?: ZoneCouverture;
     specialisations?: Specialisation;
 
+    fax?: string;
+    contact?: string;
+    notes?: string;
+
     matricule?: string;
     clients?: string[];
     affaires?: Affaire[];
+    paiements?: PaiementCommission[];
 }
 
 export interface Prospect extends TierBase {
@@ -196,6 +259,11 @@ export interface Prospect extends TierBase {
     dateConversion?: Date;
     probabilite?: number;
     notesProspect?: string;
+
+    fax?: string;
+    contact?: string; // Contact principal
+    familleProspect?: string; // Grouping
+    notes?: string;
 }
 
 export type Tier = Client | Fournisseur | Commercial | Prospect;

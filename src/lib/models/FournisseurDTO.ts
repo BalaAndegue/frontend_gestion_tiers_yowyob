@@ -14,6 +14,10 @@ export type FournisseurDTO = {
     /**
      * Nom ou Raison sociale
      */
+    code?: string;
+    /**
+     * Nom ou Raison sociale
+     */
     name: string;
     shortName?: string;
     longName?: string;
