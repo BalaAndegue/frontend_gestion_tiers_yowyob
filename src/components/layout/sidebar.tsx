@@ -18,7 +18,7 @@ import {
 
 export function Sidebar() {
     const pathname = usePathname();
-    const { tiers, currentUser } = useStore();
+    const { tiers, currentUser, openScheduler } = useStore();
 
     // Calculate counts
     const clientCount = tiers.filter(t => t.type === 'client').length;
@@ -74,10 +74,18 @@ export function Sidebar() {
                 </h1>
             </div>
 
-            <div className="p-4">
+            <div className="p-4 space-y-2">
                 <Button className="w-full justify-start gap-2 h-12 rounded-2xl shadow-md bg-white text-gray-800 hover:bg-gray-100 border border-gray-200" variant="ghost">
                     <Plus className="h-5 w-5 text-blue-600" />
                     <span className="font-medium">Nouveau Tiers</span>
+                </Button>
+
+                <Button
+                    onClick={() => openScheduler()}
+                    className="w-full justify-start gap-2 h-12 rounded-2xl shadow-lg bg-blue-600 text-white hover:bg-blue-700 border-none transition-all hover:scale-[1.02] active:scale-95"
+                >
+                    <Plus className="h-5 w-5" />
+                    <span className="font-medium">Planifier Action</span>
                 </Button>
             </div>
 

@@ -4,14 +4,13 @@ import { useParams, useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Ban, UserCheck, Save, Printer } from "lucide-react"
+import { ArrowLeft, Ban, UserCheck, Save, Printer, Plus } from "lucide-react"
 import Link from "next/link"
-import { MOCK_PROSPECTS } from "@/lib_moc_data/mock-data"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { TierForm } from "@/components/forms/tier-form"
 import {
@@ -23,13 +22,27 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useStore } from "@/lib/store"
+import { Prospect } from "@/types"
+import { ActionList } from "@/components/actions/action-list"
+import { Action } from "@/types"
 
 export default function ProspectPage() {
     const { id } = useParams()
     const router = useRouter()
+    const { tiers, fetchTiers, updateTier, openScheduler } = useStore() // Using store
     const [isEditOpen, setIsEditOpen] = useState(false)
     const [isConverting, setIsConverting] = useState(false)
     const [showConvertDialog, setShowConvertDialog] = useState(false)
+
+    useEffect(() => {
+        if (tiers.length === 0) {
+            fetchTiers()
+        }
+    }, [tiers.length, fetchTiers])
+
+    // Get prospect from store
+    const prospect = tiers.find(t => t.id === id) as Prospect;
 
     const handleConvert = async () => {
         setIsConverting(true)
@@ -52,11 +65,20 @@ export default function ProspectPage() {
         }
     }
 
-    // Mock Data
-    const prospect = MOCK_PROSPECTS.find(p => p.id === id)
+    const handleDeleteAction = async (actionId: string) => {
+        if (!prospect) return;
+        const currentActions = prospect.actions || [];
+        const updatedActions = currentActions.filter(a => a.id !== actionId);
+
+        try {
+            await updateTier(prospect.id, { actions: updatedActions });
+        } catch (error) {
+            console.error("Failed to delete action", error);
+        }
+    }
 
     if (!prospect) {
-        return <div className="p-8 text-center text-red-500">Prospect introuvable ({id})</div>
+        return <div className="p-8 text-center text-red-500">Chargement... (ou Prospect introuvable {id})</div>
     }
 
     return (
@@ -81,6 +103,15 @@ export default function ProspectPage() {
                     </div>
                 </div>
                 <div className="flex gap-2">
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        className="bg-indigo-100 text-indigo-800 hover:bg-indigo-200"
+                        onClick={() => openScheduler(prospect.id)}
+                    >
+                        <Plus className="h-4 w-4 mr-2" /> Planifier Action
+                    </Button>
+
                     <Button
                         variant="secondary"
                         size="sm"
@@ -224,7 +255,7 @@ export default function ProspectPage() {
                 </TabsList>
                 <div className="bg-white border-x border-b p-4 min-h-[150px]">
                     <TabsContent value="actions" className="mt-0">
-                        <p className="text-sm text-gray-500 italic">Historique des échanges à venir...</p>
+                        <ActionList actions={prospect.actions || []} onDelete={handleDeleteAction} />
                     </TabsContent>
                 </div>
             </Tabs>

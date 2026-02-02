@@ -149,11 +149,30 @@ export interface TierBase {
     // Extended Frontend data (mapped from backend or added)
     financial?: FinancialInfo;
     contacts?: Contact[];
+    actions?: Action[];
 
     // UI helpers (mapped from name/address/etc for backward compat if needed)
     nom?: string; // Legacy alias for name
     ville?: string; // Legacy alias for city
     telephone?: string; // Legacy alias for phoneNumber
+}
+
+export type ActionEffect = 'IMMEDIATE' | 'DEFERRED';
+export type ActionStatus = 'PENDING' | 'DONE' | 'CANCELLED';
+export type NotificationMethod = 'EMAIL' | 'SMS' | 'APP';
+
+export interface Action {
+    id: string;
+    title: string;
+    object: string; // e.g., "Relance devis"
+    followedBy: string; // ID of the employee/user
+    notificationMethod: NotificationMethod;
+    date: Date;
+    content: string;
+    effect: ActionEffect;
+    status: ActionStatus;
+    createdAt: Date;
+    completedAt?: Date;
 }
 
 export interface Client extends TierBase {

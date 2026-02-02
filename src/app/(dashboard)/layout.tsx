@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 import { DataInitializer } from '@/components/data-initializer';
+import { ActionDialog } from '@/components/actions/action-dialog';
 
 export default function DashboardLayout({
     children,
@@ -31,6 +32,8 @@ export default function DashboardLayout({
                     </div>
                 </main>
             </div>
+
+            <ActionDialog />
         </div>
     );
 }

@@ -21,6 +21,12 @@ interface AppState {
     updateTier: (id: string, tier: Partial<Tier>) => Promise<void>;
     deleteTier: (id: string) => Promise<void>;
     getTiersByType: (type: TierType) => Tier[];
+
+    // Global Scheduler State
+    isSchedulerOpen: boolean;
+    schedulerTierId: string | null;
+    openScheduler: (tierId?: string) => void;
+    closeScheduler: () => void;
 }
 
 // Temporary mock user for dev
@@ -115,6 +121,11 @@ export const useStore = create<AppState>((set, get) => ({
                     break;
             }
 
+            // STATIC IMPLEMENTATION: Preserve actions if they were passed (even if backend ignored them)
+            if (tier.actions && createdTier) {
+                createdTier.actions = tier.actions;
+            }
+
             if (createdTier) {
                 set((state) => ({
                     tiers: [...state.tiers, createdTier],
@@ -160,6 +171,14 @@ export const useStore = create<AppState>((set, get) => ({
                     break;
             }
 
+            // STATIC IMPLEMENTATION: Ensure actions are preserved in the local state result
+            // The backend might return the object without 'actions', so we must merge them back from the payload or current state.
+            if (payload.actions) {
+                updatedResult.actions = payload.actions;
+            } else if (currentTier.actions) {
+                updatedResult.actions = currentTier.actions;
+            }
+
             set((state) => ({
                 tiers: state.tiers.map((t) => (t.id === id ? updatedResult : t)),
                 isLoading: false
@@ -192,4 +211,16 @@ export const useStore = create<AppState>((set, get) => ({
     getTiersByType: (type: TierType) => {
         return get().tiers.filter((t) => t.type === type);
     },
+
+    // Global Scheduler State
+    isSchedulerOpen: false,
+    schedulerTierId: null,
+    openScheduler: (tierId?: string) => set({
+        isSchedulerOpen: true,
+        schedulerTierId: tierId || null
+    }),
+    closeScheduler: () => set({
+        isSchedulerOpen: false,
+        schedulerTierId: null
+    }),
 }));
